@@ -13,7 +13,21 @@ def validar_apellidos(apellidos: str) -> bool:
     return (len(apellidos) > 0 and len(apellidos) <= 30)
 
 # Valida que los créditos estén entre 1 y 9.
-def validar_correo(cedula: str) -> bool:
-    cedula = cedula.strip()
-    return (len(cedula) > 0 and len(cedula) <= 30)
+def validar_correo(correo: str) -> bool:
+    correo = correo.strip()
+    return (len(correo) > 0 and len(correo) <= 30)
 
+#Validar clave usuario
+def validar_clave(clave: str) -> bool:
+    clave = clave.strip()
+    return (len(clave) > 0 and len(clave) <= 30)
+
+#Validar producto
+def validar_producto(nombre_producto: str) -> bool:
+    nombre_producto = nombre_producto.strip()
+    return (len(nombre_producto) > 0 and len(nombre_producto) <= 30)
+
+#Validar categoria
+def validar_categoria(nombre_categoria: str) -> bool:
+    nombre_categoria = nombre_categoria.strip()
+    return (len(nombre_categoria) > 0 and len(nombre_categoria) <= 30)

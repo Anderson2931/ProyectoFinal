@@ -190,7 +190,7 @@ def listar_categoria():
 
 #Listar individual
 @app.route('/categoria/<Id_Categoria>', methods=['GET'])
-def leer_categoria_bd(Id_Categoria):
+def leer_categoria(Id_Categoria):
     try:
         cursor = conexion.connection.cursor()
         sql= "CALL listar_categoria_id('{0}')".format(Id_Categoria)
@@ -331,9 +331,114 @@ def leer_ingresos_db(Id_Ingresos):
             ingresos = {'Id_Ingreso': fila[0], 'cantidad_ingresos': fila[1], 'fecha': fila[2], 'valor_compra': fila[3], 'Id_Producto': fila[4]}
         return jsonify({'Ingresos': ingresos, 'mensaje': "Ingresos listados.", 'exito': True})
     except Exception as ex:
-        return jsonify({'mensaje': "Error", 'exito': False})                
+        return jsonify({'mensaje': "Error", 'exito': False}) 
 
-                   
+# ACTUALIZAR DATOS USUARIOS
+
+def leer_datos_bd(Id_usuario):
+    try:
+        cursor = conexion.connection.cursor()
+        sql = "SELECT Id_usuario, nombre_usuario, correo, clave FROM usuario WHERE Id_usuario = '{0}'".format(Id_usuario)
+        cursor.execute(sql)
+        datos = cursor.fetchone()
+        if datos != None:
+            usuario = {'Id_usuario': datos[0], 'nombre_usuario': datos[1], 'correo': datos[2], 'clave': datos[3]}
+            return usuario
+        else:
+            return None
+    except Exception as ex:
+        raise ex
+
+@app.route('/actualizar/<Id_usuario>', methods=['PUT'])
+def actualizar_datos(Id_usuario):
+    if (validar_nombres(Id_usuario) and validar_correo(request.json['nombre_usuario']) and validar_clave(request.json['nombre_usuario'])):
+        try:
+            usuario = leer_datos_bd(Id_usuario)
+            if usuario != None:
+                cursor = conexion.connection.cursor()
+                sql = """UPDATE usuario SET nombre_usuario = '{0}', correo = {1}, clave = '{2}'
+                WHERE Id_usuario = '{3}'""".format(request.json['nombre_usuario'], request.json['correo'], request.json['clave'], Id_usuario)
+                cursor.execute(sql)
+                conexion.connection.commit()  # Confirma la acción de actualización.
+                return jsonify({'mensaje': "Usuario actualizado.", 'exito': True})
+            else:
+                return jsonify({'mensaje': "Usuario no encontrado.", 'exito': False})
+        except Exception as ex:
+            return jsonify({'mensaje': "Error", 'exito': False})
+    else:
+        return jsonify({'mensaje': "Parámetros inválidos...", 'exito': False})                       
+
+# ACTUALIZAR PRODUCTOS
+
+def leer_producto_bd(id_Producto):
+    try:
+        cursor = conexion.connection.cursor()
+        sql = "SELECT id_Producto, nombre_producto FROM producto WHERE id_Producto = '{0}'".format(id_Producto)
+        cursor.execute(sql)
+        datos = cursor.fetchone()
+        if datos != None:
+            producto = {'id_Producto': datos[0], 'nombre_producto': datos[1]}
+            return producto
+        else:
+            return None
+    except Exception as ex:
+        raise ex
+
+@app.route('/actualizarproductos/<id_Producto>', methods=['PUT'])
+def actualizar_producto(id_Producto):
+    if (validar_producto(id_Producto)):
+        try:
+            producto = leer_producto_bd(id_Producto)
+            if producto != None:
+                cursor = conexion.connection.cursor()
+                sql = """UPDATE producto SET nombre_producto = '{0}', descripcion = '{1}', valor_venta = '{2}', cantidad_stock = '{3}', Estado = '{4}'
+                WHERE id_Producto = '{5}'""".format(request.json['nombre_producto'], request.json['descripcion'], request.json['valor_venta'], request.json['cantidad_stock'], request.json['Estado'],id_Producto)
+                cursor.execute(sql)
+                conexion.connection.commit()  # Confirma la acción de actualización.
+                return jsonify({'mensaje': "Producto actualizado.", 'exito': True})
+            else:
+                return jsonify({'mensaje': "Producto no encontrado.", 'exito': False})
+        except Exception as ex:
+            return jsonify({'mensaje': "Error", 'exito': False})
+    else:
+        return jsonify({'mensaje': "Parámetros inválidos...", 'exito': False})
+
+
+# ACTUALIZAR CATEGORIA
+
+def leer_categoria_bd(Id_Categoria):
+    try:
+        cursor = conexion.connection.cursor()
+        sql = "SELECT Id_Categoria, nombre_categoria FROM categoria WHERE Id_Categoria = '{0}'".format(Id_Categoria)
+        cursor.execute(sql)
+        datos = cursor.fetchone()
+        if datos != None:
+            categoria = {'Id_Categoria': datos[0], 'nombre_categoria': datos[1]}
+            return categoria
+        else:
+            return None
+    except Exception as ex:
+        raise ex
+
+
+@app.route('/actualizarcategoria/<Id_Categoria>', methods=['PUT'])
+def actualizar_categoria(Id_Categoria):
+    if (validar_categoria(Id_Categoria)):
+        try:
+            categoria = leer_categoria_bd(Id_Categoria)
+            if categoria != None:
+                cursor = conexion.connection.cursor()
+                sql = """UPDATE categoria SET nombre_categoria = '{0}', Estado = '{1}'
+                WHERE Id_Categoria = '{2}'""".format(request.json['nombre_categoria'],  request.json['Estado'], Id_Categoria)
+                cursor.execute(sql)
+                conexion.connection.commit()  # Confirma la acción de actualización.
+                return jsonify({'mensaje': "Categoria actualizada.", 'exito': True})
+            else:
+                return jsonify({'mensaje': "Categoria no encontrada.", 'exito': False})
+        except Exception as ex:
+            return jsonify({'mensaje': "Error", 'exito': False})
+    else:
+        return jsonify({'mensaje': "Parámetros inválidos...", 'exito': False})                           
      
 
 def pagina_no_encontrada(error):
